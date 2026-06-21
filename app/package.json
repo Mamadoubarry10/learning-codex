@@ -1,0 +1,12 @@
+{
+  "name": "learn_docker",
+  "version": "1.0.0",
+  "description": "fun tutorial",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
