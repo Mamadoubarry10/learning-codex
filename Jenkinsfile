@@ -40,6 +40,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Kubernetes') {
+        steps {
+        sh '''
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
+        kubectl rollout restart deployment/node-app-deployment
+        kubectl rollout status deployment/node-app-deployment
+        '''
+    }
+}
     }
 
     post {
