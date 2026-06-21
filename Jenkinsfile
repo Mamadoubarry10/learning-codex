@@ -1,35 +1,56 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = 'fatoumata12/my-node-app'
+        IMAGE_TAG = 'latest'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                echo 'Pulling code from GitHub'
+                checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                sh 'docker build -t fatoumata12/my-node-app:latest .'
+                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
             }
         }
 
-        stage('Test') {
+        stage('Verify Image') {
             steps {
-                echo 'Run tests here'
+                sh 'docker image inspect $IMAGE_NAME:$IMAGE_TAG'
             }
         }
 
-        stage('Push') {
+        stage('Push to Docker Hub') {
             steps {
-                echo 'Push image to Docker Hub'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
+                        docker push "$IMAGE_NAME:$IMAGE_TAG"
+                        docker logout
+                    '''
+                }
             }
         }
+    }
 
-        stage('Deploy') {
-            steps {
-                echo 'Deploy to Kubernetes'
-            }
+    post {
+        success {
+            echo 'Pipeline completed successfully'
+        }
+        failure {
+            echo 'Pipeline failed'
+        }
+        always {
+            sh 'docker logout >/dev/null 2>&1 || true'
         }
     }
 }
