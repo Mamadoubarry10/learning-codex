@@ -6,4 +6,6 @@ const server = createServer((request, response) => {
     return response.end();
 })
 
-server.listen(8080);
+server.listen(8080, () => {
+    console.log('Server listening on port 8080');
+});
