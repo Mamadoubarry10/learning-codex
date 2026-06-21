@@ -8,4 +8,5 @@ const server = createServer((request, response) => {
 
 server.listen(8080, () => {
     console.log('Server listening on port 8080');
+    console.log("webhook test");
 });
